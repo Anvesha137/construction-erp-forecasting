@@ -1,0 +1,6 @@
+# Tell GitHub Linguist to ignore frontend files
+# so the repo shows Python as the primary language
+
+templates/*.html linguist-detectable=false
+static/css/*.css linguist-detectable=false
+static/js/*.js   linguist-detectable=false
