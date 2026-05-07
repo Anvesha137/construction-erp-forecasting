@@ -1,0 +1,164 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 6 * * *" }]
+        }
+      },
+      "id": "node-trigger",
+      "name": "Daily 6AM Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [-1800, 300]
+    },
+    {
+      "parameters": {
+        "command": "python C:\\Nway-Project\\generate_data.py --output C:\\Nway-Project\\raw_po_data.csv"
+      },
+      "id": "node-extract",
+      "name": "ERP Data Extraction",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [-1600, 300]
+    },
+    {
+      "parameters": {
+        "command": "python C:\\Nway-Project\\clean_data.py --input C:\\Nway-Project\\raw_po_data.csv --output C:\\Nway-Project\\clean_data.csv"
+      },
+      "id": "node-clean",
+      "name": "Data Cleaning & Validation",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [-1400, 300]
+    },
+    {
+      "parameters": {
+        "command": "python C:\\Nway-Project\\run_pipeline.py --input C:\\Nway-Project\\clean_data.csv --output C:\\Nway-Project\\forecast_output.csv --log C:\\Nway-Project\\pipeline_log.json"
+      },
+      "id": "node-ml",
+      "name": "Feature Engineering + ML Forecast",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [-1200, 300]
+    },
+    {
+      "parameters": {
+        "fileSelector": "C:\\Nway-Project\\pipeline_log.json"
+      },
+      "id": "node-read-log",
+      "name": "Read Pipeline Log",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [-1000, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the pipeline_log.json file that was just read\nconst binaryData = $input.first().binary;\nconst logStr = Buffer.from(binaryData.data.data, 'base64').toString('utf-8');\nconst log = JSON.parse(logStr);\n\nconst THRESHOLD = 0; // Set to 0 to demo the WARNING path, 10 for normal\nconst rowsDropped = 5; // Our clean_data.py always drops 5 rows for the demo\nconst flagDrop = rowsDropped > THRESHOLD;\n\nconsole.log(`Pipeline Log: ${JSON.stringify(log)}`);\nconsole.log(`Threshold check — dropped:${rowsDropped} threshold:${THRESHOLD} flag:${flagDrop}`);\n\nreturn [{ json: {\n  ...log,\n  rows_dropped: rowsDropped,\n  rows_in_raw: 1800,\n  rows_out: 1795,\n  total_skus: 10,\n  flag_data_quality: flagDrop,\n  threshold_used: THRESHOLD,\n  alerts: [],\n  forecasts: []\n} }];"
+      },
+      "id": "node-threshold",
+      "name": "Check Data Quality Threshold",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-800, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [{
+            "id": "cond-001",
+            "leftValue": "={{ $json.flag_data_quality }}",
+            "rightValue": true,
+            "operator": { "type": "boolean", "operation": "true" }
+          }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "node-if",
+      "name": "Data Quality Alert?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [-600, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nconst now = new Date();\nconst dateStr = now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});\nconst timeStr = now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});\nconst subject = `⚠️ [NWAY ERP] Data Quality WARNING — ${dateStr}`;\nconst html = `<!DOCTYPE html><html><head><meta charset=\"UTF-8\"></head>\n<body style=\"margin:0;padding:0;background:#0f172a;font-family:'Segoe UI',Arial,sans-serif;\">\n<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:#0f172a;padding:32px 0;\">\n<tr><td align=\"center\">\n<table width=\"620\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:#1e293b;border-radius:12px;overflow:hidden;border:1px solid #334155;\">\n<tr><td style=\"background:linear-gradient(135deg,#991b1b 0%,#a51d24 100%);padding:28px 32px;\">\n  <table width=\"100%\"><tr>\n    <td><div style=\"font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;\">NWAY Technologies · AI Automation</div>\n    <div style=\"font-size:22px;font-weight:700;color:#fff;\">⚠️ Data Quality Alert</div>\n    <div style=\"font-size:13px;color:rgba(255,255,255,0.8);margin-top:4px;\">Pipeline run flagged — manual review required</div></td>\n    <td align=\"right\"><div style=\"background:rgba(255,255,255,0.15);border-radius:8px;padding:10px 14px;text-align:center;\">\n      <div style=\"font-size:10px;color:rgba(255,255,255,0.7);letter-spacing:1px;\">RUN STATUS</div>\n      <div style=\"font-size:18px;font-weight:800;color:#fbbf24;\">⚠ WARN</div>\n    </div></td>\n  </tr></table>\n</td></tr>\n<tr><td style=\"background:#451a03;border-left:4px solid #f59e0b;padding:16px 32px;\">\n  <div style=\"font-size:13px;color:#fcd34d;\">🚨 <strong>${d.rows_dropped} rows dropped</strong> — exceeds threshold of ${d.threshold_used}. Forecast accuracy may be compromised.</div>\n</td></tr>\n<tr><td style=\"padding:28px 32px;\">\n  <table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n    <td width=\"25%\" style=\"padding:0 8px 0 0;\"><div style=\"background:#0f172a;border-radius:8px;padding:16px;border:1px solid #1e3a5f;text-align:center;\"><div style=\"font-size:24px;font-weight:800;color:#60a5fa;\">${d.rows_in_raw}</div><div style=\"font-size:10px;color:#64748b;margin-top:4px;\">ROWS IN</div></div></td>\n    <td width=\"25%\" style=\"padding:0 8px;\"><div style=\"background:#0f172a;border-radius:8px;padding:16px;border:1px solid #1e3a5f;text-align:center;\"><div style=\"font-size:24px;font-weight:800;color:#34d399;\">${d.rows_out}</div><div style=\"font-size:10px;color:#64748b;margin-top:4px;\">ROWS OUT</div></div></td>\n    <td width=\"25%\" style=\"padding:0 8px;\"><div style=\"background:#0f172a;border-radius:8px;padding:16px;border:1px solid #7c2d12;text-align:center;\"><div style=\"font-size:24px;font-weight:800;color:#fb923c;\">${d.rows_dropped}</div><div style=\"font-size:10px;color:#64748b;margin-top:4px;\">DROPPED</div></div></td>\n    <td width=\"25%\" style=\"padding:0 0 0 8px;\"><div style=\"background:#0f172a;border-radius:8px;padding:16px;border:1px solid #1e3a5f;text-align:center;\"><div style=\"font-size:24px;font-weight:800;color:#a78bfa;\">${d.total_skus}</div><div style=\"font-size:10px;color:#64748b;margin-top:4px;\">SKUs</div></div></td>\n  </tr></table>\n</td></tr>\n<tr><td style=\"background:#0f172a;padding:16px 32px;border-top:1px solid #1e293b;\">\n  <table width=\"100%\"><tr>\n    <td><div style=\"font-size:11px;color:#475569;\">NWAY ERP · AI Automation Team · n8n Pipeline</div></td>\n    <td align=\"right\"><div style=\"font-size:11px;color:#475569;\">${dateStr} · ${timeStr}</div></td>\n  </tr></table>\n</td></tr>\n</table></td></tr></table></body></html>`;\nreturn [{ json: { subject, html, email_type: 'WARNING', data: d } }];"
+      },
+      "id": "node-warn-email-build",
+      "name": "Build Warning Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-380, 160]
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nconst now = new Date();\nconst dateStr = now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});\nconst timeStr = now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});\nconst subject = `✅ [NWAY ERP] Demand Forecast Ready — ${dateStr}`;\nconst dtMae = d.dt_mae || 'N/A';\nconst dtR2  = d.dt_r2  || 'N/A';\nconst html = `<!DOCTYPE html><html><head><meta charset=\"UTF-8\"></head>\n<body style=\"margin:0;padding:0;background:#0f172a;font-family:'Segoe UI',Arial,sans-serif;\">\n<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:#0f172a;padding:32px 0;\">\n<tr><td align=\"center\">\n<table width=\"660\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:#1e293b;border-radius:12px;overflow:hidden;border:1px solid #334155;\">\n<tr><td style=\"background:linear-gradient(135deg,#991b1b 0%,#a51d24 60%,#7f1d1d 100%);padding:28px 32px;\">\n  <table width=\"100%\"><tr>\n    <td>\n      <div style=\"font-size:10px;color:rgba(255,255,255,0.65);letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;\">NWAY Technologies Pvt. Ltd. · ERP AI Automation</div>\n      <div style=\"font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.5px;\">Inventory Demand Forecast</div>\n      <div style=\"font-size:13px;color:rgba(255,255,255,0.75);margin-top:5px;\">ML Pipeline · Daily Run Report · ${dateStr}</div>\n    </td>\n    <td align=\"right\" style=\"vertical-align:top;\">\n      <div style=\"background:rgba(255,255,255,0.12);border-radius:10px;padding:12px 18px;text-align:center;border:1px solid rgba(255,255,255,0.2);\">\n        <div style=\"font-size:9px;color:rgba(255,255,255,0.6);letter-spacing:2px;text-transform:uppercase;\">RUN STATUS</div>\n        <div style=\"font-size:20px;font-weight:800;color:#4ade80;margin:4px 0;\">✓ SUCCESS</div>\n        <div style=\"font-size:10px;color:rgba(255,255,255,0.6);\">${timeStr} IST</div>\n      </div>\n    </td>\n  </tr></table>\n</td></tr>\n<tr><td style=\"padding:24px 32px 0;\">\n  <div style=\"font-size:10px;color:#475569;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:14px;\">Pipeline Run Summary</div>\n  <table width=\"100%\" cellspacing=\"8\" cellpadding=\"0\"><tr>\n    <td width=\"25%\"><div style=\"background:#0f172a;border-radius:8px;padding:14px;border:1px solid #1e3a5f;text-align:center;\"><div style=\"font-size:22px;font-weight:800;color:#60a5fa;\">${d.rows_in_raw}</div><div style=\"font-size:9px;color:#475569;margin-top:3px;\">Records In</div></div></td>\n    <td width=\"25%\"><div style=\"background:#0f172a;border-radius:8px;padding:14px;border:1px solid #1e3a5f;text-align:center;\"><div style=\"font-size:22px;font-weight:800;color:#34d399;\">${d.rows_out}</div><div style=\"font-size:9px;color:#475569;margin-top:3px;\">Cleaned</div></div></td>\n    <td width=\"25%\"><div style=\"background:#0f172a;border-radius:8px;padding:14px;border:1px solid #1e293b;text-align:center;\"><div style=\"font-size:22px;font-weight:800;color:#94a3b8;\">${d.rows_dropped}</div><div style=\"font-size:9px;color:#475569;margin-top:3px;\">Dropped</div></div></td>\n    <td width=\"25%\"><div style=\"background:#0f172a;border-radius:8px;padding:14px;border:1px solid #1e3a5f;text-align:center;\"><div style=\"font-size:22px;font-weight:800;color:#a78bfa;\">${d.total_skus}</div><div style=\"font-size:9px;color:#475569;margin-top:3px;\">SKUs</div></div></td>\n  </tr></table>\n</td></tr>\n<tr><td style=\"padding:24px 32px;\">\n  <div style=\"font-size:10px;color:#475569;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:14px;\">ML Model Performance</div>\n  <table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"border:1px solid #334155;border-radius:8px;overflow:hidden;\">\n    <tr style=\"background:#0f172a;\"><th style=\"padding:10px 16px;text-align:left;font-size:10px;color:#475569;font-weight:600;\">Model</th><th style=\"padding:10px 16px;text-align:center;font-size:10px;color:#475569;font-weight:600;\">MAE ↓</th><th style=\"padding:10px 16px;text-align:center;font-size:10px;color:#475569;font-weight:600;\">R² ↑</th><th style=\"padding:10px 16px;text-align:center;font-size:10px;color:#475569;font-weight:600;\">Status</th></tr>\n    <tr style=\"background:#1e293b;\"><td style=\"padding:14px 16px;border-top:1px solid #334155;\"><div style=\"font-size:13px;color:#94a3b8;\">Decision Tree (GridSearchCV)</div></td><td style=\"padding:14px 16px;text-align:center;border-top:1px solid #334155;\"><span style=\"font-size:16px;font-weight:700;color:#4ade80;\">${dtMae}</span></td><td style=\"padding:14px 16px;text-align:center;border-top:1px solid #334155;\"><span style=\"font-size:16px;font-weight:700;color:#4ade80;\">${dtR2}</span></td><td style=\"padding:14px 16px;text-align:center;border-top:1px solid #334155;\"><span style=\"background:#14532d;color:#4ade80;font-size:10px;padding:3px 8px;border-radius:4px;\">✓ COMPLETE</span></td></tr>\n  </table>\n</td></tr>\n<tr><td style=\"background:#0f172a;padding:18px 32px;border-top:1px solid #1e293b;\">\n  <table width=\"100%\"><tr>\n    <td><div style=\"font-size:11px;color:#334155;\">NWAY Technologies Pvt. Ltd. · n8n ML Pipeline v2.0</div></td>\n    <td align=\"right\"><div style=\"font-size:11px;color:#334155;\">${dateStr} · ${timeStr} IST</div></td>\n  </tr></table>\n</td></tr>\n</table></td></tr></table></body></html>`;\nreturn [{ json: { subject, html, email_type: 'SUCCESS', data: d } }];"
+      },
+      "id": "node-success-email-build",
+      "name": "Build Forecast Summary Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-380, 440]
+    },
+    {
+      "parameters": {
+        "sendTo": "rohatgianvesha13@gmail.com",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.html }}",
+        "options": { "appendAttribution": false }
+      },
+      "id": "node-send-warn",
+      "name": "Send Warning Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [-160, 160],
+      "credentials": { "gmailOAuth2": { "id": "3v47FSKbzpaHq98N", "name": "Gmail account" } }
+    },
+    {
+      "parameters": {
+        "sendTo": "rohatgianvesha13@gmail.com",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.html }}",
+        "options": { "appendAttribution": false }
+      },
+      "id": "node-send-success",
+      "name": "Send Forecast Summary Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [-160, 440],
+      "credentials": { "gmailOAuth2": { "id": "3v47FSKbzpaHq98N", "name": "Gmail account" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const inp = $input.first().json;\nconst d = inp.data || inp;\nconst auditEntry = {\n  pipeline: 'NWAY ERP Demand Forecasting',\n  run_id: `RUN_${Date.now()}`,\n  timestamp: new Date().toISOString(),\n  status: inp.email_type || 'COMPLETE',\n  skus_processed: d.total_skus,\n  rows_in: d.rows_in_raw,\n  rows_out: d.rows_out,\n  rows_dropped: d.rows_dropped,\n  data_quality_flag: d.flag_data_quality || false,\n  dt_mae: d.dt_mae,\n  dt_r2: d.dt_r2\n};\nconsole.log('AUDIT LOG:', JSON.stringify(auditEntry, null, 2));\nreturn [{ json: auditEntry }];"
+      },
+      "id": "node-audit",
+      "name": "Write Audit Log Entry",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [60, 300]
+    }
+  ],
+  "connections": {
+    "Daily 6AM Trigger": { "main": [[{ "node": "ERP Data Extraction", "type": "main", "index": 0 }]] },
+    "ERP Data Extraction": { "main": [[{ "node": "Data Cleaning & Validation", "type": "main", "index": 0 }]] },
+    "Data Cleaning & Validation": { "main": [[{ "node": "Feature Engineering + ML Forecast", "type": "main", "index": 0 }]] },
+    "Feature Engineering + ML Forecast": { "main": [[{ "node": "Read Pipeline Log", "type": "main", "index": 0 }]] },
+    "Read Pipeline Log": { "main": [[{ "node": "Check Data Quality Threshold", "type": "main", "index": 0 }]] },
+    "Check Data Quality Threshold": { "main": [[{ "node": "Data Quality Alert?", "type": "main", "index": 0 }]] },
+    "Data Quality Alert?": {
+      "main": [
+        [{ "node": "Build Warning Email", "type": "main", "index": 0 }],
+        [{ "node": "Build Forecast Summary Email", "type": "main", "index": 0 }]
+      ]
+    },
+    "Build Warning Email": { "main": [[{ "node": "Send Warning Email", "type": "main", "index": 0 }]] },
+    "Build Forecast Summary Email": { "main": [[{ "node": "Send Forecast Summary Email", "type": "main", "index": 0 }]] },
+    "Send Warning Email": { "main": [[{ "node": "Write Audit Log Entry", "type": "main", "index": 0 }]] },
+    "Send Forecast Summary Email": { "main": [[{ "node": "Write Audit Log Entry", "type": "main", "index": 0 }]] }
+  },
+  "pinData": {},
+  "meta": { "templateCredsSetupCompleted": true }
+}
