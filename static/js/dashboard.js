@@ -35,8 +35,7 @@ function setupSidebar() {
                 'Inventory': '/inventory',
                 'Projects (BIM)': '/projects',
                 'Transport TLMS': '/transport',
-                'HRMS Integration': '/hrms',
-                'AI Forecasting': '/' // Maps back to the main AI dashboard
+                'HRMS Integration': '/hrms'
             };
 
             if (routes[moduleName]) {
