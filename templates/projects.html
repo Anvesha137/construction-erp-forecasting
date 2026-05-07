@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nway ERP | Projects (BIM)</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        .progress-bar { height: 8px; background: var(--bg-main); border-radius: 4px; overflow: hidden; margin-top: 0.5rem; }
+        .progress-fill { height: 100%; background: var(--primary); border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo-area">
+            <div class="logo-text">
+                <span style="font-weight: 800; color: var(--primary);">Nway</span><span style="font-weight: 300;">ERP</span>
+            </div>
+            <div class="version-tag">Construction v4.2</div>
+        </div>
+        <ul class="nav-links">
+            <li>Dashboard</li>
+            <li>Procurement</li>
+            <li>Inventory</li>
+            <li class="active">Projects (BIM)</li>
+            <li>Transport TLMS</li>
+            <li>HRMS Integration</li>
+            <li>AI Forecasting</li>
+        </ul>
+        <div class="sidebar-footer">
+            <div>Logged in as</div>
+            <div style="font-weight: 600; color: #fff;">Site Admin</div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <header>
+            <div class="header-left">
+                <h1>Project Management</h1>
+                <p class="subtitle">BIM integration and milestone tracking.</p>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-primary">+ NEW PROJECT</button>
+            </div>
+        </header>
+
+        <main class="container">
+            <div class="dashboard-grid">
+                <div class="panel main-chart animate-in" style="grid-column: span 6;">
+                    <h2>Site A: Alpha Tech Park</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Commercial Office Space - Phase 2</p>
+                    <div style="margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                            <span>Completion</span>
+                            <span style="color: var(--primary); font-weight: bold;">68%</span>
+                        </div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 68%;"></div></div>
+                    </div>
+                    <div style="display: flex; gap: 2rem; font-size: 0.85rem;">
+                        <div>
+                            <div style="color: var(--text-muted);">Budget Used</div>
+                            <div style="font-weight: bold; color: var(--warning);">₹12.4CR / ₹15CR</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--text-muted);">Estimated Delivery</div>
+                            <div style="font-weight: bold;">Nov 2026</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel main-chart animate-in" style="grid-column: span 6; animation-delay: 0.1s;">
+                    <h2>Site B: Beta Residences</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Luxury High-Rise - Foundation Phase</p>
+                    <div style="margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                            <span>Completion</span>
+                            <span style="color: var(--success); font-weight: bold;">12%</span>
+                        </div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 12%; background: var(--success);"></div></div>
+                    </div>
+                    <div style="display: flex; gap: 2rem; font-size: 0.85rem;">
+                        <div>
+                            <div style="color: var(--text-muted);">Budget Used</div>
+                            <div style="font-weight: bold;">₹2.1CR / ₹25CR</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--text-muted);">Estimated Delivery</div>
+                            <div style="font-weight: bold;">Mar 2028</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nway ERP | Intelligent Construction Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div id="loader" class="loading-overlay">
+        <div class="spinner"></div>
+        <div style="margin-top: 1.5rem; font-weight: 600; letter-spacing: 0.05em; color: var(--primary);">SYNCHRONIZING ERP DATA</div>
+        <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem; font-family: var(--font-mono);">Fetching Construction Modules...</div>
+    </div>
+
+    <!-- Sidebar Navigation for realistic ERP feel -->
+    <nav class="sidebar">
+        <div class="logo-area">
+            <div class="logo-text">
+                <span style="font-weight: 800; color: var(--primary);">Nway</span><span style="font-weight: 300;">ERP</span>
+            </div>
+            <div class="version-tag">Construction v4.2</div>
+        </div>
+        <ul class="nav-links">
+            <li class="active">Dashboard</li>
+            <li>Procurement</li>
+            <li>Inventory</li>
+            <li>Projects (BIM)</li>
+            <li>Transport TLMS</li>
+            <li>HRMS Integration</li>
+            <li>AI Forecasting</li>
+        </ul>
+        <div class="sidebar-footer">
+            <div>Logged in as</div>
+            <div style="font-weight: 600; color: #fff;">Site Admin</div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <header>
+            <div class="header-left">
+                <h1>Demand & Resource Intelligence</h1>
+                <p class="subtitle">AI-driven material forecasting for active construction sites.</p>
+            </div>
+            <div class="header-right">
+                <div class="status-indicator">
+                    <span class="dot"></span> Live ERP Sync
+                </div>
+                <div id="last-run" class="last-run-text"></div>
+                <button class="btn btn-primary" onclick="refreshPipeline()">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    RE-CALCULATE
+                </button>
+            </div>
+        </header>
+
+        <main class="container">
+            <div class="dashboard-grid">
+                
+                <!-- KPIs -->
+                <div class="kpi-card animate-in" style="animation-delay: 0.1s;">
+                    <div class="kpi-label">MANAGED MATERIALS (SKUs)</div>
+                    <div class="kpi-value" id="kpi-skus">0</div>
+                    <div class="kpi-trend trend-up">↑ Real-time tracking</div>
+                </div>
+                <div class="kpi-card animate-in" style="animation-delay: 0.2s;">
+                    <div class="kpi-label">PO RECORDS ANALYZED</div>
+                    <div class="kpi-value" id="kpi-records">0</div>
+                    <div class="kpi-trend trend-neutral">Last 6 Months</div>
+                </div>
+                <div class="kpi-card animate-in" style="animation-delay: 0.3s;">
+                    <div class="kpi-label">PREDICTION ERROR (MAE)</div>
+                    <div class="kpi-value" id="kpi-mae" style="color: var(--secondary);">0.00</div>
+                    <div class="kpi-trend trend-up">↓ 12% Improvement</div>
+                </div>
+                <div class="kpi-card animate-in" style="animation-delay: 0.4s;">
+                    <div class="kpi-label">FORECAST CONFIDENCE</div>
+                    <div class="kpi-value" id="kpi-r2" style="color: var(--success);">0%</div>
+                    <div class="kpi-trend trend-up">Decision Tree Engine</div>
+                </div>
+
+                <!-- Main Chart Area -->
+                <div class="panel main-chart animate-in" style="animation-delay: 0.5s;">
+                    <div class="panel-header">
+                        <h2>Material Demand Projection</h2>
+                        <div id="sku-selector" class="sku-selector"></div>
+                    </div>
+                    <div style="height: 320px; width: 100%;">
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Feature Importance -->
+                <div class="panel side-panel animate-in" style="animation-delay: 0.6s;">
+                    <h2>AI Decision Factors</h2>
+                    <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1.5rem; line-height: 1.4;">
+                        Key ERP variables influencing the procurement forecast for the selected material.
+                    </p>
+                    <div id="importance-bars"></div>
+                </div>
+
+                <!-- Table -->
+                <div class="panel full-width animate-in" style="animation-delay: 0.7s;">
+                    <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h2>Procurement Action Center</h2>
+                        <div class="badge badge-primary">Next 7 Days</div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Material / Item Code</th>
+                                    <th>Category</th>
+                                    <th>Primary Supplier</th>
+                                    <th class="text-right">Current Stock</th>
+                                    <th class="text-right">Predicted Need</th>
+                                    <th class="text-center">Action Required</th>
+                                </tr>
+                            </thead>
+                            <tbody id="forecast-tbody">
+                                <!-- Data injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

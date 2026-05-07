@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nway ERP | Inventory Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo-area">
+            <div class="logo-text">
+                <span style="font-weight: 800; color: var(--primary);">Nway</span><span style="font-weight: 300;">ERP</span>
+            </div>
+            <div class="version-tag">Construction v4.2</div>
+        </div>
+        <ul class="nav-links">
+            <li>Dashboard</li>
+            <li>Procurement</li>
+            <li class="active">Inventory</li>
+            <li>Projects (BIM)</li>
+            <li>Transport TLMS</li>
+            <li>HRMS Integration</li>
+            <li>AI Forecasting</li>
+        </ul>
+        <div class="sidebar-footer">
+            <div>Logged in as</div>
+            <div style="font-weight: 600; color: #fff;">Site Admin</div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <header>
+            <div class="header-left">
+                <h1>Inventory Control</h1>
+                <p class="subtitle">Multi-site stock visibility and transfers.</p>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-primary">+ RECORD INBOUND</button>
+            </div>
+        </header>
+
+        <main class="container">
+            <div class="dashboard-grid">
+                <div class="kpi-card animate-in" style="animation-delay: 0.1s;">
+                    <div class="kpi-label">TOTAL VALUE</div>
+                    <div class="kpi-value">₹1.8CR</div>
+                    <div class="kpi-trend trend-up">Across 4 Sites</div>
+                </div>
+                <div class="kpi-card animate-in" style="animation-delay: 0.2s;">
+                    <div class="kpi-label">CRITICAL LOW STOCK</div>
+                    <div class="kpi-value" style="color: var(--danger);">3 ITEMS</div>
+                    <div class="kpi-trend trend-down">Immediate Action Reqd</div>
+                </div>
+            </div>
+
+            <div class="panel full-width animate-in" style="margin-top: 1.5rem; animation-delay: 0.3s;">
+                <div class="panel-header">
+                    <h2>Stock across Sites</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Central Hub</th>
+                                <th>Site A (Alpha)</th>
+                                <th>Site B (Beta)</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Portland Cement (50kg)</td>
+                                <td>1,200</td>
+                                <td>400</td>
+                                <td style="color: var(--danger);">12</td>
+                                <td style="font-weight: bold;">1,612</td>
+                            </tr>
+                            <tr>
+                                <td>TMT Steel Bars (12mm)</td>
+                                <td>80 Tons</td>
+                                <td>15 Tons</td>
+                                <td>22 Tons</td>
+                                <td style="font-weight: bold;">117 Tons</td>
+                            </tr>
+                            <tr>
+                                <td>Ready-Mix Concrete</td>
+                                <td>0</td>
+                                <td style="color: var(--warning);">120 m³</td>
+                                <td>450 m³</td>
+                                <td style="font-weight: bold;">570 m³</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

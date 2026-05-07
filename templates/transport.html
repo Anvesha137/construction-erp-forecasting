@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nway ERP | Transport TLMS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo-area">
+            <div class="logo-text">
+                <span style="font-weight: 800; color: var(--primary);">Nway</span><span style="font-weight: 300;">ERP</span>
+            </div>
+            <div class="version-tag">Construction v4.2</div>
+        </div>
+        <ul class="nav-links">
+            <li>Dashboard</li>
+            <li>Procurement</li>
+            <li>Inventory</li>
+            <li>Projects (BIM)</li>
+            <li class="active">Transport TLMS</li>
+            <li>HRMS Integration</li>
+            <li>AI Forecasting</li>
+        </ul>
+        <div class="sidebar-footer">
+            <div>Logged in as</div>
+            <div style="font-weight: 600; color: #fff;">Site Admin</div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <header>
+            <div class="header-left">
+                <h1>Transport & Logistics (TLMS)</h1>
+                <p class="subtitle">Fleet management and delivery tracking.</p>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-primary">DISPATCH TRUCK</button>
+            </div>
+        </header>
+
+        <main class="container">
+            <div class="dashboard-grid">
+                <div class="kpi-card animate-in" style="animation-delay: 0.1s;">
+                    <div class="kpi-label">ACTIVE FLEET</div>
+                    <div class="kpi-value">42</div>
+                    <div class="kpi-trend trend-up">Trucks on road</div>
+                </div>
+                <div class="kpi-card animate-in" style="animation-delay: 0.2s;">
+                    <div class="kpi-label">IN-TRANSIT VALUE</div>
+                    <div class="kpi-value" style="color: var(--primary);">₹45L</div>
+                    <div class="kpi-trend trend-neutral">Raw Materials</div>
+                </div>
+            </div>
+
+            <div class="panel full-width animate-in" style="margin-top: 1.5rem; animation-delay: 0.3s;">
+                <div class="panel-header">
+                    <h2>Live Tracking</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Vehicle No.</th>
+                                <th>Driver</th>
+                                <th>Cargo</th>
+                                <th>Destination</th>
+                                <th>Status</th>
+                                <th>ETA</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="font-family: var(--font-mono); font-weight: bold;">MP-09-AB-1234</td>
+                                <td>Rajesh K.</td>
+                                <td>40T Cement</td>
+                                <td>Site A</td>
+                                <td><span class="badge badge-primary">In Transit</span></td>
+                                <td style="color: var(--success); font-weight: bold;">14:30 Today</td>
+                            </tr>
+                            <tr>
+                                <td style="font-family: var(--font-mono); font-weight: bold;">MH-12-PQ-9988</td>
+                                <td>Suresh M.</td>
+                                <td>15T TMT Bars</td>
+                                <td>Site B</td>
+                                <td><span class="badge badge-warning" style="background: rgba(245,158,11,0.1); color: var(--warning); border: 1px solid var(--warning);">Delayed</span></td>
+                                <td style="color: var(--danger); font-weight: bold;">18:00 Today</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

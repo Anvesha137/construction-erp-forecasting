@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nway ERP | Procurement Module</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        .po-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .po-card:hover {
+            border-color: var(--primary);
+            background: rgba(14, 165, 233, 0.05);
+            transform: translateX(4px);
+        }
+        .po-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+        .po-id {
+            font-family: var(--font-mono);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .po-amount {
+            font-weight: 600;
+        }
+        .po-vendor {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        .po-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.75rem;
+        }
+        .two-cols {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+        .approval-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        .approval-btn:hover {
+            background: #059669;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="logo-area">
+            <div class="logo-text">
+                <span style="font-weight: 800; color: var(--primary);">Nway</span><span style="font-weight: 300;">ERP</span>
+            </div>
+            <div class="version-tag">Construction v4.2</div>
+        </div>
+        <ul class="nav-links">
+            <li data-target="/">Dashboard</li>
+            <li class="active" data-target="/procurement">Procurement</li>
+            <li data-target="Inventory">Inventory</li>
+            <li data-target="Projects">Projects (BIM)</li>
+            <li data-target="Transport">Transport TLMS</li>
+            <li data-target="HRMS">HRMS Integration</li>
+            <li data-target="AI">AI Forecasting</li>
+        </ul>
+        <div class="sidebar-footer">
+            <div>Logged in as</div>
+            <div style="font-weight: 600; color: #fff;">Site Admin</div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <header>
+            <div class="header-left">
+                <h1>Procurement & Approvals</h1>
+                <p class="subtitle">Manage Purchase Orders (POs) and Vendor Relations.</p>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-primary" onclick="alert('Creating new PO...')">
+                    + NEW PURCHASE ORDER
+                </button>
+            </div>
+        </header>
+
+        <main class="container">
+            
+            <div class="dashboard-grid">
+                <!-- Procurement Stats -->
+                <div class="kpi-card animate-in" style="animation-delay: 0.1s;">
+                    <div class="kpi-label">PENDING APPROVALS</div>
+                    <div class="kpi-value" style="color: var(--warning);">14</div>
+                    <div class="kpi-trend trend-neutral">Requires Admin Sign-off</div>
+                </div>
+                <div class="kpi-card animate-in" style="animation-delay: 0.2s;">
+                    <div class="kpi-label">ACTIVE VENDORS</div>
+                    <div class="kpi-value">28</div>
+                    <div class="kpi-trend trend-up">↑ 3 Onboarded this month</div>
+                </div>
+                <div class="kpi-card animate-in" style="animation-delay: 0.3s;">
+                    <div class="kpi-label">MONTHLY SPEND</div>
+                    <div class="kpi-value">₹4.2M</div>
+                    <div class="kpi-trend trend-down">↓ 8% from last month</div>
+                </div>
+                <div class="kpi-card animate-in" style="animation-delay: 0.4s;">
+                    <div class="kpi-label">AI AUTO-PROCURE</div>
+                    <div class="kpi-value" style="color: var(--primary);">ACTIVE</div>
+                    <div class="kpi-trend trend-up">Handling 40% of low-value POs</div>
+                </div>
+            </div>
+
+            <div class="two-cols" style="margin-top: 1.5rem;">
+                
+                <!-- Pending POs List -->
+                <div class="panel animate-in" style="animation-delay: 0.5s;">
+                    <div class="panel-header">
+                        <h2>Pending Purchase Orders</h2>
+                    </div>
+                    
+                    <div class="po-card">
+                        <div class="po-header">
+                            <div class="po-id">PO-2026-9081</div>
+                            <div class="po-amount">₹4,50,000</div>
+                        </div>
+                        <div class="po-vendor">UltraTech Cement Ltd. • 1200 Bags</div>
+                        <div class="po-vendor" style="color: var(--primary); font-size: 0.75rem;">Generated by AI Forecasting Engine</div>
+                        <div class="po-footer">
+                            <span style="color: var(--warning);">Awaiting Level 2 Approval</span>
+                            <button class="approval-btn" onclick="this.innerText='APPROVED'; this.style.background='var(--text-muted)';">APPROVE PO</button>
+                        </div>
+                    </div>
+
+                    <div class="po-card">
+                        <div class="po-header">
+                            <div class="po-id">PO-2026-9082</div>
+                            <div class="po-amount">₹8,20,000</div>
+                        </div>
+                        <div class="po-vendor">Tata Tiscon • 8 Tons TMT Steel Bars</div>
+                        <div class="po-footer">
+                            <span style="color: var(--warning);">Awaiting Level 2 Approval</span>
+                            <button class="approval-btn" onclick="this.innerText='APPROVED'; this.style.background='var(--text-muted)';">APPROVE PO</button>
+                        </div>
+                    </div>
+
+                    <div class="po-card">
+                        <div class="po-header">
+                            <div class="po-id">PO-2026-9085</div>
+                            <div class="po-amount">₹1,15,000</div>
+                        </div>
+                        <div class="po-vendor">Kajaria Ceramics • 400 Boxes Vitrified Tiles</div>
+                        <div class="po-footer">
+                            <span style="color: var(--warning);">Awaiting Level 1 Approval</span>
+                            <button class="approval-btn" onclick="this.innerText='APPROVED'; this.style.background='var(--text-muted)';">APPROVE PO</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Vendor Performance -->
+                <div class="panel animate-in" style="animation-delay: 0.6s;">
+                    <div class="panel-header">
+                        <h2>Vendor Performance</h2>
+                    </div>
+                    
+                    <table style="font-size: 0.8rem;">
+                        <thead>
+                            <tr>
+                                <th>Vendor</th>
+                                <th>Rating</th>
+                                <th>On-Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Tata Tiscon</td>
+                                <td style="color: var(--success);">4.9 ★</td>
+                                <td>98%</td>
+                            </tr>
+                            <tr>
+                                <td>UltraTech Cement</td>
+                                <td style="color: var(--success);">4.7 ★</td>
+                                <td>94%</td>
+                            </tr>
+                            <tr>
+                                <td>Finolex Cables</td>
+                                <td style="color: var(--warning);">4.2 ★</td>
+                                <td>82%</td>
+                            </tr>
+                            <tr>
+                                <td>Local Sand Synd.</td>
+                                <td style="color: var(--danger);">3.4 ★</td>
+                                <td>61%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top: 2rem;">
+                        <h2 style="font-size: 0.9rem; margin-bottom: 1rem;">Logistics Sync (TLMS)</h2>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>In-Transit Deliveries</span>
+                                <span style="color: var(--primary); font-weight: 600;">12 Trucks</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Expected Today</span>
+                                <span style="color: var(--success); font-weight: 600;">4 Trucks</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
