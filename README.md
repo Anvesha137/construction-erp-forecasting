@@ -354,15 +354,3 @@ The ML pipeline runs automatically on startup. The first load may take 10–20 s
   "logs": [ ... ]
 }
 ```
-
----
-
-## 🔮 Future Roadmap
-
-1. **Live Database Integration** — Connect `data_gen.py` to Nway's actual PostgreSQL/Oracle backend via SQLAlchemy
-2. **Model Persistence** — Save trained models as `.pkl` files so the server doesn't retrain on every restart
-3. **Auto-PO Trigger** — When AI detects stock-out risk, automatically create a draft Purchase Order in the Procurement module database instead of just a UI alert
-4. **TLMS Sync** — When a PO is approved, automatically dispatch the nearest available truck from Transport TLMS
-5. **Role-Based Access Control (RBAC)** — Site Engineers see only their site. Procurement Managers see all POs. CFO sees only budget views.
-6. **Alerting Engine** — Send SMS/Email via Twilio or AWS SNS when a critical reorder alert is triggered
-7. **Model Upgrade** — Once real data volume exceeds 50,000 rows, upgrade to **XGBoost** or **LightGBM** for higher accuracy
