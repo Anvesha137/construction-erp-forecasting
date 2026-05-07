@@ -3,14 +3,14 @@ let allData = null;
 let activeSkuIdx = 0;
 
 const COLORS = {
-    primary: '#0ea5e9',
-    secondary: '#6366f1',
-    success: '#10b981',
-    warning: '#f59e0b',
-    danger: '#ef4444',
-    border: '#23304c',
-    text: '#94a3b8',
-    panelBg: '#151e32'
+    primary: '#c41e3a',
+    secondary: '#d4a373',
+    success: '#15803d',
+    warning: '#b45309',
+    danger: '#b91c1c',
+    border: '#e8e4db',
+    text: '#4b5563',
+    panelBg: '#ffffff'
 };
 
 async function init() {
@@ -159,8 +159,8 @@ function renderForecastChart(idx) {
                 {
                     label: 'Historical PO Quantity',
                     data: histData,
-                    borderColor: '#3b82f6', // Slightly muted blue
-                    backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                    borderColor: '#4b5563', // Muted slate for history
+                    backgroundColor: 'rgba(75, 85, 99, 0.05)',
                     fill: true,
                     tension: 0.3,
                     pointRadius: 2,
@@ -169,8 +169,8 @@ function renderForecastChart(idx) {
                 {
                     label: 'AI Forecasted Need',
                     data: forecastData,
-                    borderColor: COLORS.primary, // Bright Nway blue
-                    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                    borderColor: COLORS.primary, // Nway Red
+                    backgroundColor: 'rgba(196, 30, 58, 0.05)',
                     fill: true,
                     tension: 0.3,
                     borderDash: [5, 5],
@@ -234,7 +234,7 @@ function renderImportanceChart() {
                 <span style="color: var(--primary); font-family: var(--font-mono);">${item.val}%</span>
             </div>
             <div style="height: 6px; background: var(--bg-main); border-radius: 3px; overflow: hidden; border: 1px solid var(--border);">
-                <div style="height: 100%; width: ${item.val}%; background: linear-gradient(90deg, #0ea5e9, #38bdf8); border-radius: 2px;"></div>
+                <div style="height: 100%; width: ${item.val}%; background: linear-gradient(90deg, #c41e3a, #8B1A1A); border-radius: 2px;"></div>
             </div>
         </div>
     `).join('');
