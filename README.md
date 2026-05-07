@@ -366,16 +366,3 @@ The ML pipeline runs automatically on startup. The first load may take 10–20 s
 5. **Role-Based Access Control (RBAC)** — Site Engineers see only their site. Procurement Managers see all POs. CFO sees only budget views.
 6. **Alerting Engine** — Send SMS/Email via Twilio or AWS SNS when a critical reorder alert is triggered
 7. **Model Upgrade** — Once real data volume exceeds 50,000 rows, upgrade to **XGBoost** or **LightGBM** for higher accuracy
-
----
-
-## 👤 Author
-
-Built as an Internship Project at **Nway Technologies Pvt. Ltd.**  
-For: **Nway ERP for Construction** product line  
-Stack: Python · Flask · scikit-learn · Chart.js  
-Website: [nwaytech.com](https://www.nwaytech.com) | ERP: [nwayerp.com](https://www.nwayerp.com)
-
----
-
-> *"The best procurement is the one you never had to think about."*
