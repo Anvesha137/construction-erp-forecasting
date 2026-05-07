@@ -106,7 +106,7 @@ function renderDashboard() {
     document.getElementById('kpi-r2').innerText = (d.dt.r2 * 100).toFixed(1) + '%';
     
     // Last Run
-    document.getElementById('last-run').innerText = 'Sync: ' + d.run_time;
+    // Removed sync text as per request
 
     // SKU Selection
     renderSkuSelector();
