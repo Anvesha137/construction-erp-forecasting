@@ -354,3 +354,22 @@ The ML pipeline runs automatically on startup. The first load may take 10–20 s
   "logs": [ ... ]
 }
 ```
+
+---
+
+## 🤖 n8n Automation Pipeline (Demo Ready)
+
+This project includes a series of standalone CLI scripts designed to be orchestrated by **n8n**. This demonstrates how the AI Forecasting engine can be integrated into a real-world, automated enterprise workflow.
+
+### CLI Workflow Scripts
+- **`generate_data.py`**: Simulates the extraction of raw PO data from the Nway ERP database.
+- **`clean_data.py`**: Implements the **Silent Null-Drop Fix**. Validates raw data, handles missing values, and logs quality metrics.
+- **`run_pipeline.py`**: Orchestrates feature engineering and the ML model run, outputting forecasts and audit logs.
+
+### The n8n Workflow
+1. **Trigger**: Cron schedule (e.g., 6:00 AM daily).
+2. **Extraction**: Calls `generate_data.py`.
+3. **Validation**: Calls `clean_data.py`.
+4. **Processing**: Calls `run_pipeline.py`.
+5. **Alerting**: An **IF Node** checks `pipeline_log.json` for rows dropped. If quality is low, it sends a **Slack/Email Alert**.
+6. **Delivery**: Sends a beautiful HTML report to the Procurement Manager via **Gmail**.
